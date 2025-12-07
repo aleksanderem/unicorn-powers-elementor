@@ -3,7 +3,7 @@
  * Plugin Name: Unicorn Powers for Elementor
  * Plugin URI: https://github.com/aleksanderem/unicorn-powers-elementor
  * Description: Efekt "Magic Card" inspirowany MagicUI - spotlight gradient podążający za kursorem. Dostępny jako opcja w ustawieniach wizualnych kontenerów Elementora oraz jako shortcode [magic_card].
- * Version: 2.1.0
+ * Version: 1.0.0
  * Author: MWT Solutions
  * Author URI: https://mwtsolutions.eu
  * License: GPL2+
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'MAGIC_CARD_VERSION', '2.1.0' );
+define( 'MAGIC_CARD_VERSION', '1.0.0' );
 define( 'MAGIC_CARD_URL', plugin_dir_url( __FILE__ ) );
 define( 'MAGIC_CARD_PATH', plugin_dir_path( __FILE__ ) );
 
