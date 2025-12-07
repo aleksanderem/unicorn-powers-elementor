@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicorn Powers - Demo</title>
+    <link rel="stylesheet" href="magic-card.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 60px;
+            font-size: 1.2rem;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #a78bfa;
+            border-left: 4px solid #a78bfa;
+            padding-left: 16px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 32px;
+            min-height: 280px;
+            overflow: hidden;
+        }
+
+        .card-label {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .card p {
+            color: #888;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .features li {
+            padding: 8px 0;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .testimonial {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .author-title {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 40px 32px;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        /* Conic Glow specific styles for demo */
+        .conic-demo {
+            --magic-card-border-radius: 20px;
+            --magic-card-border-width: 2px;
+            --magic-card-conic-gradient: conic-gradient(from var(--magic-conic-start, 0deg), #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+            --magic-card-conic-idle-opacity: 0.3;
+            --magic-card-inner-glow-size: 180px;
+            --magic-card-inner-glow-blur: 25px;
+            --magic-card-inner-glow-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .spotlight-demo {
+            --magic-card-border-radius: 20px;
+            --magic-card-blob-size: 280px;
+            --magic-card-blob-color: rgba(102, 126, 234, 0.15);
+        }
+
+        .animated-border-demo {
+            --magic-card-border-radius: 20px;
+            --magic-card-border-width: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Unicorn Powers</h1>
+        <p class="subtitle">Zaawansowane efekty wizualne dla Elementora</p>
+
+        <!-- Conic Glow Section -->
+        <section class="section">
+            <h2 class="section-title">Conic Glow + Inner Glow</h2>
+            <div class="grid">
+                <!-- Pricing Card -->
+                <div class="card conic-demo has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="conic_glow"
+                     data-magic-inner-glow-colors='["rgba(59,130,246,0.3)","rgba(139,92,246,0.3)","rgba(236,72,153,0.3)"]'>
+                    <span class="card-label">Popular</span>
+                    <h3>Pro Plan</h3>
+                    <div class="price">$29<span>/mo</span></div>
+                    <ul class="features">
+                        <li>Unlimited projects</li>
+                        <li>Priority support</li>
+                        <li>Advanced analytics</li>
+                        <li>Custom integrations</li>
+                    </ul>
+                    <a href="#" class="btn">Get Started</a>
+                </div>
+
+                <!-- Feature Card -->
+                <div class="card conic-demo has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="conic_glow"
+                     data-magic-inner-glow-colors='["rgba(16,185,129,0.3)","rgba(6,182,212,0.3)"]'>
+                    <div class="card-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized performance with GPU-accelerated animations. Smooth 60fps on all devices.</p>
+                </div>
+
+                <!-- Testimonial -->
+                <div class="card conic-demo has-magic-card testimonial"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="conic_glow"
+                     data-magic-conic-glow-persists="true"
+                     data-magic-inner-glow-colors='["rgba(245,158,11,0.25)","rgba(239,68,68,0.25)","rgba(236,72,153,0.25)"]'>
+                    <p class="testimonial-text">"This plugin transformed our website. The effects are stunning and the performance is incredible."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">Anna Kowalska</div>
+                            <div class="author-title">CEO, TechStartup</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spotlight Section -->
+        <section class="section">
+            <h2 class="section-title">Spotlight Effect</h2>
+            <div class="grid">
+                <!-- Product Card -->
+                <div class="card spotlight-demo has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="spotlight"
+                     data-magic-tilt="true">
+                    <div class="card-icon">🎨</div>
+                    <h3>Design System</h3>
+                    <p>Complete design system with components, tokens, and guidelines for consistent UI.</p>
+                    <a href="#" class="btn">Explore</a>
+                </div>
+
+                <!-- Service Card -->
+                <div class="card spotlight-demo has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="spotlight"
+                     data-magic-spotlight-always-on="true">
+                    <span class="card-label">Always On</span>
+                    <div class="card-icon">🔧</div>
+                    <h3>API Integration</h3>
+                    <p>Seamless integration with any REST or GraphQL API. Built-in caching and error handling.</p>
+                </div>
+
+                <!-- Info Card -->
+                <div class="card spotlight-demo has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="spotlight"
+                     data-magic-tilt="true">
+                    <div class="card-icon">📊</div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Real-time analytics with beautiful charts. Track conversions, engagement, and growth.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section with Children Mode -->
+        <section class="section">
+            <h2 class="section-title">Children Mode - Stats Grid</h2>
+            <div class="grid magic-card-parent"
+                 data-magic-card-mode="children"
+                 data-magic-effect-mode="conic_glow"
+                 data-magic-inner-glow-colors='["rgba(99,102,241,0.3)","rgba(168,85,247,0.3)"]'
+                 style="--magic-card-border-radius: 16px; --magic-card-conic-idle-opacity: 0.2;">
+
+                <div class="card stat-card">
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-value">50K+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-value">4.9★</div>
+                    <div class="stat-label">Rating</div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mixed Effects -->
+        <section class="section">
+            <h2 class="section-title">Real-Life Examples</h2>
+            <div class="grid">
+                <!-- Dashboard Widget -->
+                <div class="card has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="conic_glow"
+                     data-magic-conic-always-visible="true"
+                     data-magic-inner-glow-colors='["rgba(34,197,94,0.3)"]'
+                     style="--magic-card-border-radius: 16px; --magic-card-conic-gradient: conic-gradient(from var(--magic-conic-start, 0deg), #22c55e, #22c55e); --magic-card-conic-idle-opacity: 0.5;">
+                    <span class="card-label">Live</span>
+                    <h3>System Status</h3>
+                    <p style="color: #22c55e; font-weight: 600; font-size: 1.2rem; margin: 20px 0;">● All Systems Operational</p>
+                    <p>Last checked: 2 minutes ago</p>
+                </div>
+
+                <!-- Notification Card -->
+                <div class="card has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="conic_glow"
+                     data-magic-inner-glow-colors='["rgba(239,68,68,0.3)","rgba(245,158,11,0.3)"]'
+                     style="--magic-card-border-radius: 16px; --magic-card-conic-gradient: conic-gradient(from var(--magic-conic-start, 0deg), #ef4444, #f59e0b, #ef4444);">
+                    <span class="card-label" style="background: rgba(239,68,68,0.2); color: #ef4444;">Alert</span>
+                    <h3>Action Required</h3>
+                    <p>Your subscription expires in 3 days. Renew now to keep access to all features.</p>
+                    <a href="#" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);">Renew Now</a>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="card has-magic-card"
+                     data-magic-card-mode="self"
+                     data-magic-effect-mode="spotlight"
+                     data-magic-tilt="true"
+                     style="--magic-card-border-radius: 24px; --magic-card-blob-color: rgba(236,72,153,0.12); text-align: center;">
+                    <div class="author-avatar" style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);"></div>
+                    <h3>Jan Nowak</h3>
+                    <p style="color: #a78bfa;">Senior Developer</p>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.2rem;">142</div>
+                            <div style="color: #888; font-size: 0.85rem;">Projects</div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.2rem;">8.5k</div>
+                            <div style="color: #888; font-size: 0.85rem;">Followers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="magic-card.js"></script>
+</body>
+</html>
