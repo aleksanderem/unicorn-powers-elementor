@@ -1,0 +1,513 @@
+/**
+ * Magic Card Effect - Lytbox Style
+ */
+
+/* ===========================================
+   LAYER 1: MAGIC HOLDER
+   =========================================== */
+.magic-holder {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: -2 !important;
+    overflow: hidden !important;
+    border-radius: var(--magic-card-border-radius, 12px) !important;
+    pointer-events: none !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.magic-holder .blob {
+    position: absolute !important;
+    width: var(--magic-card-blob-size, 250px) !important;
+    height: var(--magic-card-blob-size, 250px) !important;
+    /* Use CSS variable as base, but allow Elementor's background-color to override */
+    background: var(--magic-card-blob-color, rgba(14, 165, 233, 0.9));
+    border-radius: 50% !important;
+    filter: blur(var(--magic-card-blur, 40px)) !important;
+    opacity: 0;
+    transition: opacity 300ms linear !important;
+    pointer-events: none !important;
+}
+
+.magic-holder .fakeblob {
+    position: absolute !important;
+    inset: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* ===========================================
+   LAYER 2: INNER BLUR
+   =========================================== */
+.magic-inner-blur {
+    position: absolute !important;
+    inset: var(--magic-card-border-width, 2px) !important;
+    background: var(--magic-card-inner-bg, rgba(255, 255, 255, 0.85)) !important;
+    backdrop-filter: blur(40px) !important;
+    -webkit-backdrop-filter: blur(40px) !important;
+    z-index: -1 !important;
+    border-radius: calc(var(--magic-card-border-radius, 12px) - var(--magic-card-border-width, 2px)) !important;
+    pointer-events: none !important;
+}
+
+.no-magic .magic-holder{display:none !important}
+.no-magic .magic-inner-blur{display:none !important}
+
+/* ===========================================
+   MODE: SPOTLIGHT ALWAYS-ON
+   Blob visible at all times, movement only on hover
+   =========================================== */
+.magic-holder.spotlight-always-on .blob {
+    opacity: 1 !important;
+    transition: opacity 300ms linear, transform 300ms ease-out !important;
+}
+
+/* ===========================================
+   CSS HOUDINI: @property for animating angles
+   (Fallback uses transform: rotate on the blob)
+   =========================================== */
+@property --magic-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+/* ===========================================
+   MODE: ANIMATED BORDER
+   Base styles only - colors set via inline CSS variables per element
+   =========================================== */
+.magic-holder.mode-animated_border .blob {
+    /* Override spotlight blob styles */
+    width: 150% !important;
+    height: 150% !important;
+    left: -25% !important;
+    top: -25% !important;
+    border-radius: 0 !important;
+    filter: blur(var(--magic-card-blur, 40px)) !important;
+    opacity: 0 !important;
+
+    /* Gradient from CSS variable with fallback for editor preview */
+    background: var(--magic-card-multi-gradient, conic-gradient(from 0deg, rgba(14, 165, 233, 1) 0deg, rgba(168, 85, 247, 1) 180deg, rgba(14, 165, 233, 1) 360deg)) !important;
+
+    /* Animation */
+    animation: magic-rotate-transform var(--magic-card-animation-speed, 4s) linear infinite !important;
+    animation-direction: var(--magic-card-animation-direction, normal) !important;
+    animation-play-state: paused !important;
+    animation-delay: var(--magic-card-animation-delay, 0ms) !important;
+}
+
+/* Active state */
+.magic-holder.mode-animated_border.magic-active .blob {
+    opacity: 1 !important;
+    animation-play-state: running !important;
+}
+
+/* No viewport trigger - always active */
+.magic-holder.mode-animated_border:not(.magic-viewport-enabled) .blob {
+    opacity: 1 !important;
+    animation-play-state: running !important;
+}
+
+/* ===========================================
+   MODE: BEAM
+   Base styles only - colors set via inline CSS variables per element
+   =========================================== */
+.magic-holder.mode-beam .blob {
+    /* Override spotlight blob styles */
+    width: 150% !important;
+    height: 150% !important;
+    left: -25% !important;
+    top: -25% !important;
+    border-radius: 0 !important;
+    filter: blur(var(--magic-card-blur, 40px)) !important;
+    opacity: 0 !important;
+
+    /* Beam gradient from CSS variable with fallback for editor preview */
+    background: var(--magic-card-beam-gradient, conic-gradient(from 0deg, transparent 0deg, transparent 15deg, rgba(14, 165, 233, 1) 28deg, rgba(168, 85, 247, 1) 46deg, rgba(14, 165, 233, 1) 60deg, transparent 75deg)) !important;
+
+    /* Animation */
+    animation: magic-rotate-transform var(--magic-card-animation-speed, 4s) linear infinite !important;
+    animation-direction: var(--magic-card-animation-direction, normal) !important;
+    animation-play-state: paused !important;
+    animation-delay: var(--magic-card-animation-delay, 0ms) !important;
+}
+
+/* Active state */
+.magic-holder.mode-beam.magic-active .blob {
+    opacity: 1 !important;
+    animation-play-state: running !important;
+}
+
+/* No viewport trigger - always active */
+.magic-holder.mode-beam:not(.magic-viewport-enabled) .blob {
+    opacity: 1 !important;
+    animation-play-state: running !important;
+}
+
+/* ===========================================
+   MODE: CONIC GLOW
+   Aceternity-style spotlight effect with masked conic gradient
+   Uses background-attachment: fixed for shared gradient across cards
+   =========================================== */
+
+/* CSS property for animating the spotlight angle */
+@property --magic-conic-start {
+    syntax: '<number>';
+    initial-value: 0;
+    inherits: true;
+}
+
+@property --magic-conic-active {
+    syntax: '<number>';
+    initial-value: 0;
+    inherits: true;
+}
+
+.magic-holder.mode-conic_glow {
+    /* Override default holder styles */
+    overflow: visible !important;
+}
+
+.magic-holder.mode-conic_glow .blob {
+    /* Hide the regular blob - we use ::after on .glow element instead */
+    display: none !important;
+}
+
+.magic-holder.mode-conic_glow .fakeblob {
+    display: none !important;
+}
+
+/* Container for conic glow elements */
+.magic-holder.mode-conic_glow .magic-conic-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+/* Idle border - always visible, subtle border on all cards */
+/* Fades out when spotlight is active to prevent brightness stacking */
+.magic-holder.mode-conic_glow .magic-conic-idle {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    padding: var(--magic-card-conic-border-width, 2px);
+    background: var(--magic-card-conic-gradient, radial-gradient(circle, #dd7bbb 10%, #dd7bbb00 20%), radial-gradient(circle at 40% 40%, #d79f1e 5%, #d79f1e00 15%), radial-gradient(circle at 60% 60%, #5a922c 10%, #5a922c00 20%), radial-gradient(circle at 40% 60%, #4c7894 10%, #4c789400 20%), repeating-conic-gradient(from 236.84deg at 50% 50%, #dd7bbb 0%, #d79f1e 5%, #5a922c 10%, #4c7894 15%, #dd7bbb 20%));
+    background-attachment: fixed;
+    filter: blur(2px);
+    /* Idle opacity fades when spotlight active: idle * (1 - spotlight*0.7) */
+    /* When spotlight=0: shows full idle opacity */
+    /* When spotlight=1: shows idle * 0.3 (reduced to prevent stacking) */
+    opacity: calc(var(--magic-card-conic-idle-opacity, 0.15) * (1 - var(--magic-conic-active, 0) * 0.7));
+    transition: opacity 0.3s ease;
+    /* Border-only mask */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* The spotlight glow effect - gradient border with conic mask */
+.magic-holder.mode-conic_glow .magic-conic-spotlight {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+
+    /* Gradient border using padding + mask technique */
+    padding: var(--magic-card-conic-border-width, 2px);
+    background: var(--magic-card-conic-gradient, radial-gradient(circle, #dd7bbb 10%, #dd7bbb00 20%), radial-gradient(circle at 40% 40%, #d79f1e 5%, #d79f1e00 15%), radial-gradient(circle at 60% 60%, #5a922c 10%, #5a922c00 20%), radial-gradient(circle at 40% 60%, #4c7894 10%, #4c789400 20%), repeating-conic-gradient(from 236.84deg at 50% 50%, #dd7bbb 0%, #d79f1e 5%, #5a922c 10%, #4c7894 15%, #dd7bbb 20%));
+    background-attachment: fixed;
+
+    /* Blur effect */
+    filter: blur(var(--magic-card-conic-blur, 4px));
+
+    /* Opacity with smooth transition */
+    opacity: var(--magic-conic-active, 0);
+    transition: opacity 0.3s ease;
+
+    /* Mask: content-box hides inner area, conic-gradient creates spotlight */
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        conic-gradient(
+            from calc((var(--magic-conic-start, 0) - var(--magic-card-conic-spread, 60)) * 1deg),
+            transparent 0deg,
+            #fff calc(var(--magic-card-conic-spread, 60) * 1deg),
+            transparent calc(var(--magic-card-conic-spread, 60) * 2deg)
+        );
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        conic-gradient(
+            from calc((var(--magic-conic-start, 0) - var(--magic-card-conic-spread, 60)) * 1deg),
+            transparent 0deg,
+            #fff calc(var(--magic-card-conic-spread, 60) * 1deg),
+            transparent calc(var(--magic-card-conic-spread, 60) * 2deg)
+        );
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* Inner glow wrapper - clips the blurred glow to card bounds */
+/* z-index: 1 to be above content but below Elementor editor overlays */
+.magic-inner-glow {
+    position: absolute !important;
+    inset: var(--magic-card-border-width, 2px) !important;
+    border-radius: calc(var(--magic-card-border-radius, 12px) - var(--magic-card-border-width, 2px)) !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    z-index: 1 !important;
+    opacity: 0;
+    transition: opacity 0.3s ease !important;
+}
+
+/* In Elementor editor, ensure inner glow is visible for preview */
+.elementor-editor-active .magic-inner-glow {
+    z-index: 10 !important;
+    opacity: 0.7 !important; /* Always visible in editor for preview */
+}
+
+/* Inner glow layers - two layers for crossfade animation */
+.magic-inner-glow-layer {
+    position: absolute !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out !important;
+
+    /* Blur for softer glow */
+    filter: blur(var(--magic-card-inner-glow-blur, 20px));
+}
+
+.magic-inner-glow-layer.active {
+    opacity: 1;
+}
+
+/* ===========================================
+   KEYFRAMES - using transform for compatibility
+   =========================================== */
+@keyframes magic-rotate-transform {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===========================================
+   CHILDREN MODE: Inherit CSS variables
+   Supports both direct children and children inside .e-con-inner
+   =========================================== */
+.magic-card-parent > [data-element_type="container"],
+.magic-card-parent > .e-con-inner > [data-element_type="container"],
+.magic-card-enabled-yes > [data-element_type="container"],
+.magic-card-enabled-yes > .e-con-inner > [data-element_type="container"],
+.magic-card-parent [data-element_type="container"],
+.magic-card-enabled-yes [data-element_type="container"] {
+    --magic-card-animation-speed: inherit;
+    --magic-card-animation-direction: inherit;
+    --magic-card-blur: inherit;
+    --magic-card-border-radius: inherit;
+    --magic-card-border-width: inherit;
+    --magic-card-inner-bg: inherit;
+    --magic-card-multi-gradient: inherit;
+    --magic-card-beam-gradient: inherit;
+    --magic-card-start-delay: inherit;
+    --magic-card-cascade-delay: inherit;
+    --magic-card-conic-gradient: inherit;
+    --magic-card-conic-spread: inherit;
+    --magic-card-conic-border-width: inherit;
+    --magic-card-conic-blur: inherit;
+    --magic-card-conic-inactive-zone: inherit;
+    --magic-card-conic-proximity: inherit;
+    --magic-card-conic-duration: inherit;
+    --magic-card-conic-idle-opacity: inherit;
+    --magic-card-inner-glow-size: inherit;
+    --magic-card-inner-glow-color: inherit;
+    --magic-card-inner-glow-blur: inherit;
+    --magic-card-inner-glow-speed: inherit;
+    --magic-card-glow-radius: inherit;
+    --magic-card-blob-size: inherit;
+    --magic-card-blob-color: inherit;
+}
+
+/* Inner glow needs to inherit variables from parent container */
+.magic-inner-glow {
+    --magic-card-inner-glow-size: inherit;
+    --magic-card-inner-glow-color: inherit;
+    --magic-card-inner-glow-blur: inherit;
+    --magic-card-inner-glow-speed: inherit;
+    --magic-card-border-width: inherit;
+    --magic-card-border-radius: inherit;
+}
+[data-magic-effect-mode="animated_border"]{
+    border:none;
+}
+
+/* ===========================================
+   MAGIC BUTTON WIDGET STYLES
+   Custom widget with animated gradient effects
+   =========================================== */
+
+/* CSS property for animating conic-gradient angle */
+@property --magic-btn-border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+/* Keyframes */
+@keyframes magic-btn-shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes magic-btn-border-spin {
+    to { --magic-btn-border-angle: 360deg; }
+}
+
+/* Text shadow moves opposite to shimmer highlight */
+@property --magic-btn-shadow-x {
+    syntax: '<length>';
+    initial-value: 2px;
+    inherits: false;
+}
+
+@keyframes magic-btn-shadow-move {
+    0% { --magic-btn-shadow-x: 2px; }
+    50% { --magic-btn-shadow-x: -2px; }
+    100% { --magic-btn-shadow-x: 2px; }
+}
+
+/* ===========================================
+   WRAPPER
+   =========================================== */
+.magic-btn-wrapper {
+    position: relative;
+    display: inline-block;
+    transition: transform 0.4s ease;
+}
+
+.magic-btn-wrapper:hover {
+    transform: scale(var(--magic-btn-hover-scale, 1.03));
+}
+
+/* ===========================================
+   ANIMATED BORDER (::before)
+   =========================================== */
+.magic-btn-wrapper[data-magic-button-mode="border_only"]::before,
+.magic-btn-wrapper[data-magic-button-mode="full"]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: var(--magic-btn-border-width, 2px);
+    background: var(--magic-btn-border-gradient);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: magic-btn-border-spin var(--magic-btn-speed, 7s) linear infinite;
+    pointer-events: none;
+}
+
+/* ===========================================
+   GLOW EFFECT (.magic-btn-glow element)
+   easeInOutQuart: cubic-bezier(0.76, 0, 0.24, 1)
+   =========================================== */
+.magic-btn-glow {
+    position: absolute;
+    inset: var(--magic-btn-glow-inset, -10px -18px);
+    background: var(--magic-btn-glow-gradient);
+    background-size: 300% 100%;
+    animation: magic-btn-shimmer var(--magic-btn-speed, 7s) ease-in-out infinite;
+    filter: brightness(0.6) blur(var(--magic-btn-glow-blur, 10px));
+    opacity: var(--magic-btn-glow-opacity, 0.6);
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Hidden by default - glow compressed to invisible */
+.magic-btn-wrapper[data-magic-glow-hidden] .magic-btn-glow {
+    inset: var(--magic-btn-glow-inset-hidden, 50% 50%);
+    opacity: 0;
+}
+
+/* Hover reveals glow with smooth animation */
+.magic-btn-wrapper[data-magic-glow-hidden]:hover .magic-btn-glow {
+    inset: var(--magic-btn-glow-inset-hover, -10px -18px);
+    opacity: var(--magic-btn-glow-opacity-hover, 0.8);
+}
+
+/* Always visible glow - just opacity change on hover */
+.magic-btn-wrapper:not([data-magic-glow-hidden]):hover .magic-btn-glow {
+    opacity: var(--magic-btn-glow-opacity-hover, 0.8);
+}
+
+/* ===========================================
+   BUTTON ELEMENT
+   =========================================== */
+.magic-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 400;
+    background: var(--magic-btn-bg, #0a0a0f2e);
+    border-radius: inherit;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+.magic-btn-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===========================================
+   TEXT SHIMMER (text_only & full modes)
+   =========================================== */
+.magic-btn-wrapper[data-magic-button-mode="text_only"] .magic-btn-text,
+.magic-btn-wrapper[data-magic-button-mode="full"] .magic-btn-text,
+.magic-btn-wrapper[data-magic-button-mode="text_only"] .magic-btn-icon,
+.magic-btn-wrapper[data-magic-button-mode="full"] .magic-btn-icon {
+    background: var(--magic-btn-text-gradient);
+    background-size: 210% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation:
+        magic-btn-shimmer var(--magic-btn-speed, 7s) ease-in-out infinite,
+        magic-btn-shadow-move var(--magic-btn-speed, 7s) ease-in-out infinite;
+    filter: drop-shadow(var(--magic-btn-shadow-x, 2px) 1px 2px var(--magic-btn-shadow-color, rgba(0,0,0,0.35)));
+}
+
+/* Border only: solid text color */
+.magic-btn-wrapper[data-magic-button-mode="border_only"] .magic-btn-text,
+.magic-btn-wrapper[data-magic-button-mode="border_only"] .magic-btn-icon {
+    -webkit-text-fill-color: currentColor;
+}
+
+/* ===========================================
+   ICON
+   =========================================== */
+.magic-btn-icon {
+    display: inline-flex;
+    align-items: center;
+}
+
+.magic-btn-icon svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+}
