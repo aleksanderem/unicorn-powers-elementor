@@ -1,19 +1,40 @@
 <?php
 /**
- * Plugin Name: Magic Card Effect
+ * Plugin Name: Unicorn Powers for Elementor
+ * Plugin URI: https://github.com/aleksanderem/unicorn-powers-elementor
  * Description: Efekt "Magic Card" inspirowany MagicUI - spotlight gradient podążający za kursorem. Dostępny jako opcja w ustawieniach wizualnych kontenerów Elementora oraz jako shortcode [magic_card].
- * Version: 2.0
+ * Version: 2.1.0
  * Author: MWT Solutions
+ * Author URI: https://mwtsolutions.eu
  * License: GPL2+
+ * Requires at least: 5.8
+ * Requires PHP: 7.4
+ * Text Domain: unicorn-powers
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'MAGIC_CARD_VERSION', '2.0' );
+define( 'MAGIC_CARD_VERSION', '2.1.0' );
 define( 'MAGIC_CARD_URL', plugin_dir_url( __FILE__ ) );
 define( 'MAGIC_CARD_PATH', plugin_dir_path( __FILE__ ) );
+
+/**
+ * Plugin Update Checker - automatyczne aktualizacje z GitHub
+ */
+if ( file_exists( MAGIC_CARD_PATH . 'vendor/plugin-update-checker.php' ) ) {
+    require_once MAGIC_CARD_PATH . 'vendor/plugin-update-checker.php';
+
+    $updateChecker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+        'https://github.com/aleksanderem/unicorn-powers-elementor',
+        __FILE__,
+        'unicorn-powers-elementor'
+    );
+
+    // Opcjonalnie: użyj releases zamiast branch
+    $updateChecker->getVcsApi()->enableReleaseAssets();
+}
 
 /**
  * Register CSS i JS dla efektu Magic Card (early, before enqueue).
